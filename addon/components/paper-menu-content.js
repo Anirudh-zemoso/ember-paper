@@ -58,15 +58,12 @@ export default ContentComponent.extend({
     }
   }),
 
-  addGlobalEvents() {
-    window.addEventListener('scroll', this.runloopAwareReposition);
-    window.addEventListener('resize', this.runloopAwareReposition);
-    window.addEventListener('orientationchange', this.runloopAwareReposition);
+  startObservingDomMutations() {
     if (MutObserver) {
       this.mutationObserver = new MutObserver((mutations) => {
         // e-b-d incorrectly counts ripples as a mutation, triggering a problematic repositon
         // convert NodeList to Array
-        let addedNodes = Array.prototype.slice.call(mutations[0].addedNodes).filter((node) => !$(node).hasClass('md-ripple') && (node.nodeName !== '#comment'));
+        let addedNodes = Array.prototype.slice.call(mutations[0].addedNodes).filter((node) => !$(node).hasClass('md-ripple') && (node.nodeName !== '#comment') && !(node.nodeName === '#text' && node.nodeValue === ''));
         let removedNodes = Array.prototype.slice.call(mutations[0].removedNodes).filter((node) => !$(node).hasClass('md-ripple') && (node.nodeName !== '#comment'));
 
         if (addedNodes.length || removedNodes.length) {
